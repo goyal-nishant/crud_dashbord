@@ -1,0 +1,31 @@
+
+table tr {
+    border:2px solid black;
+}
+table td {
+    border:2px solid black;
+}
+table thead th {
+    border:2px solid black;
+}
+
+table thead{
+    background-color: grey;
+}
+a{  
+padding: 20px;
+text-decoration: none;
+color: black;
+}
+button{
+margin: 10px;
+}
+.containers{
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+  }
+
+  .tables{
+    margin-left:310px;
+  }

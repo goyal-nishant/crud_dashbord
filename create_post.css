@@ -1,0 +1,12 @@
+input:invalid {
+    border: 2px dashed red;
+}
+
+input:invalid:required {
+    background-image: linear-gradient(to right, pink, lightgreen);
+}
+
+.butn {
+    margin-top: 80px;
+    margin-left: 20px;
+}

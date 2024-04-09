@@ -1,0 +1,188 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_name'])) {
+    header('location: login.php');
+    exit();
+}
+
+include 'conn.php';
+$message = "";
+$error = array(); 
+
+$sql = "SELECT id, name FROM categories WHERE parent_id = '0'";
+$result = mysqli_query($GLOBALS['conn'], $sql);
+
+$categories = array();
+
+if(mysqli_num_rows($result) > 0) {
+    while($row = mysqli_fetch_assoc($result)) {
+        $categories[$row['id']] = $row['name']; 
+    }
+}
+
+$subcategories = array();
+
+foreach ($categories as $catId => $catName) {
+    $subcategoriesSql = "SELECT id, name FROM categories WHERE parent_id = '$catId'";
+    $subResult = mysqli_query($GLOBALS['conn'], $subcategoriesSql);
+    if(mysqli_num_rows($subResult) > 0) {
+        while($subRow = mysqli_fetch_assoc($subResult)) {
+            $subcategories[$catId][$subRow['id']] = $subRow['name'];
+        }
+    }
+}
+
+$error = array(); 
+
+if(isset($_POST['submit'])) {
+    $title = $_POST['title'];
+    $description = $_POST['description'];
+    if(isset($_POST['categories'])) {
+        $selected_categories = $_POST['categories']; 
+    } else {
+        $selected_categories = array(); // Set it to an empty array if not set
+    }
+        $status = $_POST['status'];
+
+    if(empty($title)) {
+        $error['title'] = "Please insert a title.";
+    }
+
+    if(empty($description)) {
+        $error['description'] = "Please Insert a description.";
+    }  
+
+    if(empty($selected_categories) || in_array('select', $selected_categories)) {
+        $error['categories'] = "Please select at least one category.";
+    }
+
+    if($status === 'select') {
+        $error['status'] = "Please select a status.";
+    }
+
+    // Image upload handling
+    $image_name = $_FILES['image']['name'];
+    $image_tmp = $_FILES['image']['tmp_name'];
+    $image_size = $_FILES['image']['size'];
+    $upload_directory = "uploads/"; // Directory where you want to store uploaded images
+
+    if (empty($image_name)) {
+        $error['image'] = "Please select an image.";
+    } elseif ($image_size > 5000000) { // 5MB
+        $error['image'] = "Image size must be less than 5MB";
+    } else {
+        $target_file = $upload_directory . basename($image_name);
+        if (!move_uploaded_file($image_tmp, $target_file)) {
+            $error['image'] = "Error uploading image";
+        }
+    }
+
+    if(empty($error)) {
+        // Convert array of categories into comma-separated string
+        $categoryString = implode(',', $selected_categories);
+        
+        // Insert into database
+        $sql = "INSERT INTO posts (title, description, category, status, image) VALUES ('$title', '$description', '$categoryString', '$status', '$image_name')";
+        $result = mysqli_query($GLOBALS['conn'], $sql);
+        
+        if($result) {
+            $message = "Post inserted successfully.";
+
+            // Retrieve the ID of the newly inserted post
+            $postId = mysqli_insert_id($GLOBALS['conn']);
+
+            // Loop through selected categories and insert post_id and category_id into posts_categories table
+            foreach($selected_categories as $categoryId) {
+                $insertPostsCategoriesQuery = "INSERT INTO posts_categories (post_id, category_id) VALUES ('$postId', '$categoryId')";
+                mysqli_query($GLOBALS['conn'], $insertPostsCategoriesQuery);
+            }
+        } else {
+            $message = "Error: " . mysqli_error($GLOBALS['conn']);
+        }
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="create_post.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="download.png">
+</head>
+<body>
+    <div class="topnav" id="myTopnav">
+        <a href="http://localhost/crudByoops/home.php" class="active" required>Home</a>
+        <a href="http://localhost/crudByoops/list.php" required>Category</a>
+        <a href="http://localhost/crudByoops/view_post.php" required>Post</a>
+        <a href="logout.php"><input type="submit" name="" value="logout"></a>
+        <a href="javascript:void(0);" style="font-size:15px;" class="icon" onclick="myFunction()">&#9776;</a>
+    </div>
+    <script>
+        function myFunction() {
+            var x = document.getElementById("myTopnav");
+            if (x.className === "topnav") {
+                x.className += " responsive";
+            } else {
+                x.className = "topnav";
+            }
+        }
+    </script>
+    <div class="border container pb-5 pt-3 ml-1" style="text-align: center;">
+        <h3>Create Posts</h3>
+    </div>
+    <form action="" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" minlength="7">
+            <span><?php echo isset($error['title']) ? $error['title'] : "";  ?></span>
+        </div>
+        <div class="mb-3">
+            <label for="desc" class="form-label">Description</label>
+            <input type="text" class="form-control" id="desc" name="description">
+            <span><?php echo isset($error['description']) ? $error['description'] : ""; ?></span>
+        </div>
+        
+        <label for="category">Categories</label>
+        <?php foreach($categories as $catId => $catName): ?>
+            <div>
+                <input type="checkbox" id="category<?php echo $catId; ?>" name="categories[]" value="<?php echo $catId; ?>">
+                <label for="category<?php echo $catId; ?>"><?php echo $catName; ?></label>
+                <?php if(isset($subcategories[$catId])): ?>
+                    <div style="margin-left: 20px;">
+                        <?php foreach($subcategories[$catId] as $subcatId => $subcatName): ?>
+                            <div>
+                                <input type="checkbox" id="subcategory<?php echo $subcatId; ?>" name="categories[]" value="<?php echo $subcatId; ?>">
+                                <label for="subcategory<?php echo $subcatId; ?>"><?php echo $subcatName; ?></label>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+        
+        <div class="mb-3">
+            <label for="image" class="form-label">Image</label>
+            <input type="file" class="form-control" id="image" name="image">
+            <span><?=isset($error['image']) ? $error['image'] : ""?></span>
+        </div>
+
+        <label for="status">Status</label>
+        <select name="status" id="status" required>
+            <option value="select">Select</option>
+            <option value="Draft">Draft</option>
+            <option value="publish">Publish</option>
+        </select>
+
+        <input type="submit" value="Upload Post" name="submit" class="btn btn-primary butn batn">
+        <a href="http://localhost/crudByoops/view_post.php"><input type="button" value="view post" name="view post" class="btn btn-primary butn"></a>
+        <p class="message"><?php echo $message; ?></p>
+    </form>
+
+    
+</body>
+</html>
