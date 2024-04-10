@@ -11,7 +11,16 @@ header('Cache-Control: no-cache, no-store, must-revalidate');
 header('Pragma: no-cache');
 header('Expires: 0');
 
+function excerpt($title) {
+        $new = substr($title, 0, 27);
 
+        if (strlen($title) > 30) {
+            return $new.'...';
+        } else {
+            return $title;
+        }
+    }
+    
 if (isset($_POST['update_category'])) {
    
     header('Location: view_post.php');
@@ -70,7 +79,7 @@ if (!$data) {
                 echo "<tr>
                     <td>$result[id]</td>
                     <td>$result[title]</td>
-                    <td>$result[description]</td>
+                    <td>" . excerpt($result['description']) . "</td>
                     <td>$result[category_names]</td>
                     <td>$result[status]</td>
                     <td><img src='uploads/$result[image]' style='max-width: 100px; max-height: 100px;' alt='Post Image'></td>

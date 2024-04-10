@@ -19,7 +19,6 @@
 <body>
     
 <div class="topnav" id="myTopnav">
-  <a href="http://localhost/crudByoops/view_posts_public.php">Post</a>
   <a href="http://localhost/crudByoops/view_category_public.php">Category</a>
   <!-- <a href="#contact">Contact</a> -->
   <!-- <div class="dropdown">

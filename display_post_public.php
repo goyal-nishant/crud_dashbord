@@ -21,6 +21,7 @@ if(isset($_GET['id'])){
 </head>
 <body>
     <div class="container">
+        
         <?php if (isset($data)): ?>
         <h2 class="post-title"><?=$data['title'];?></h2>
         

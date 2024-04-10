@@ -18,6 +18,15 @@ include 'conn.php';
 <body>
 <div class="container">
     <?php
+      function excerpt($title) {
+        $new = substr($title, 0, 27);
+
+        if (strlen($title) > 30) {
+            return $new.'...';
+        } else {
+            return $title;
+        }
+    }
     if (isset($_GET['category_id'])) {
         $category_id = $_GET['category_id'];
         $sql_category = "SELECT name FROM categories WHERE id = $category_id";
@@ -52,7 +61,9 @@ include 'conn.php';
                     if ($result_posts === false) {
                         echo "Error: " . mysqli_error($GLOBALS['connect']);
                     } else {
-                        while ($post_data = mysqli_fetch_assoc($result_posts)) {
+
+                        while ($post_data = mysqli_fetch_assoc($result_posts)) {  
+                            if($post_data['status'] == 'publish'){ 
                             if (!isset($row_count) || $row_count % 2 == 0) {
                                 echo "<div class='row'>";
                             }
@@ -60,14 +71,14 @@ include 'conn.php';
                             echo "<a href='display_post_public.php?id={$post_data['id']}'>";
                             echo "<img src='uploads/$post_data[image]' style='max-width: 100px; max-height: 100px;' alt='Post Image'>";
                             echo "<h3>{$post_data['title']}</h3>";
-                            echo "<p>{$post_data['description']}</p>";
+                            echo "<p>" . excerpt($post_data['description']) . "</p>";
                             echo "</a>";
                             echo "</div>";
                             if ($row_count % 2 == 1 || $row_count == mysqli_num_rows($result_posts) - 1) {
                                 echo "</div>"; // Close row if it's the end of row or last post
                             }
                             $row_count++;
-                        }
+                        }}
                     }
                 } else {
                     echo "No posts found for this category.";
