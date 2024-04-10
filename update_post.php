@@ -78,6 +78,9 @@ if (isset($_POST['update'])) {
     <title>Update post</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="icon" type="image/x-icon" href="download.png">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>      
 </head>
 <body>
 <div>
@@ -91,7 +94,7 @@ if (isset($_POST['update'])) {
     </div>
     <div class="mb-3">
         <label for="desc" class="form-label">Description</label>
-        <input type="text" class="form-control" id="desc" name="description" required value="<?= $result['description']; ?>">
+        <textarea class="form-control" id="desc" name="description" required><?= $result['description']; ?></textarea>
     </div>
 
     <label>Category</label><br>
@@ -120,5 +123,16 @@ if (isset($_POST['update'])) {
 
     <input type="submit" value="Update" name="update" style="margin-top: 50px;">
 </form>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#desc").summernote({
+            placeholder: "Enter Description",
+            height: 300
+        });
+    });
+</script>
 </body>
 </html>

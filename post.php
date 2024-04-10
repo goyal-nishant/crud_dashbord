@@ -114,6 +114,9 @@ if(isset($_POST['submit'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="download.png">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
     <div class="topnav" id="myTopnav">
@@ -144,7 +147,7 @@ if(isset($_POST['submit'])) {
         </div>
         <div class="mb-3">
             <label for="desc" class="form-label">Description</label>
-            <input type="text" class="form-control" id="desc" name="description">
+            <textarea class="form-control" id="desc" name="description"></textarea>
             <span><?php echo isset($error['description']) ? $error['description'] : ""; ?></span>
         </div>
         
@@ -183,7 +186,16 @@ if(isset($_POST['submit'])) {
         <a href="http://localhost/crudByoops/view_post.php"><input type="button" value="view post" name="view post" class="btn btn-primary butn"></a>
         <p class="message"><?php echo $message; ?></p>
     </form>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
 
-    
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#desc").summernote({
+            placeholder: "Enter Description",
+            height: 300
+        });
+    });
+</script>
 </body>
 </html>
