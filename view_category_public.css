@@ -1,0 +1,22 @@
+      /* Include the styles here */
+      .category-box {
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+        padding: 10px;
+    }
+
+    .category-header {
+        
+        margin-bottom: 10px;
+    }
+
+    .category-header h4 {
+        margin: 0;
+    }
+    .category-header h4 a{
+        text-decoration: none;
+        color: black;
+    }
+    .category-content {
+        padding-left: 20px;
+    }

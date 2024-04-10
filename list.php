@@ -76,8 +76,6 @@ function showcategory($parentid, $level = 0) {
          <a href="http://localhost/crudByoops/catagory.php"><input type="submit" value="Create Categories" class="btn btn-primary"></a>
     </div>
 </div>
-
-
     <?php
     echo showcategory(0); 
     ?>
@@ -91,11 +89,7 @@ function myFunction() {
   }
 }
 </script>
-<script>
-function confirmDelete() {
-    return confirm("Are you sure you want to delete this category?");
-}
-</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
 </body>

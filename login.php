@@ -1,7 +1,6 @@
 <?php
-
-
 include 'customers.php';
+include 'header_login.php';
 $obj = new Customers();
 
 if(isset($_POST['login'])){
@@ -9,7 +8,6 @@ if(isset($_POST['login'])){
 }
 
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +20,7 @@ if(isset($_POST['login'])){
     <link rel="icon" type="image/x-icon" href="download.png">
 </head>
 <body>
-    <div class="container"><h3>Login page</h3></div>
+    <div class="container" style="margin-top:50px;"><h3>Login page</h3></div>
 
      <div class="container">
         

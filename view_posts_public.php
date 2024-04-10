@@ -1,11 +1,6 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_name'])) {
-    header('location: login.php');
-    exit();
-}
 include 'conn.php';
-include 'header.php';
+include 'header_login.php';
 
 header('Cache-Control: no-cache, no-store, must-revalidate');
 header('Pragma: no-cache');
@@ -49,9 +44,7 @@ if (!$data) {
     </div>
     <div class="border container pb-5 pt-3 " style="margin-bottom:30px; text-align: center;">
       <h3>All Post</h3>
-      <div class="" style="margin-top: 25px;">
-          <a class="ancor" href="post.php"><input  type="button" value="create post" name="" style="color: white;background-color: #0d6efd;font-weight: 400;line-height: 1.5;text-align: center;text-decoration: none;border: 1px solid transparent;padding: .375rem .75rem;font-size: 1rem;border-radius: .25rem;"></a>
-      </div>
+
     </div>
     <div class=" container">
         <table class="table">
@@ -62,7 +55,6 @@ if (!$data) {
                 <td>Categories</td>
                 <td>Status</td>
                 <td>Image</td>
-                <td colspan="2";>Option</td>
                 <td>Display post</td>
             </tr>
             <?php
@@ -74,9 +66,7 @@ if (!$data) {
                     <td>$result[category_names]</td>
                     <td>$result[status]</td>
                     <td><img src='uploads/$result[image]' style='max-width: 100px; max-height: 100px;' alt='Post Image'></td>
-                    <td><a href='update_post.php?id=$result[id]'>Edit</a></td>
-                    <td><a href='post_delete.php?id=$result[id]' onclick='return confirmDelete();'>DELETE</a></td>
-                    <td><a href='display_posts.php?id=$result[id]'>View</a></td>
+                    <td><a href='display_post_public.php?id=$result[id]'>View</a></td>
 
                 </tr>";
             }

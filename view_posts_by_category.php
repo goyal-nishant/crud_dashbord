@@ -1,11 +1,5 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_name'])) {
-    header('location: login.php');
-    exit();
-}
-
-include 'header.php';
+include 'header_login.php';
 include 'connection.php';
 include 'conn.php';
 
@@ -63,7 +57,7 @@ include 'conn.php';
                                 echo "<div class='row'>";
                             }
                             echo "<div class='post-card'>";
-                            echo "<a href='display_posts.php?id={$post_data['id']}'>";
+                            echo "<a href='display_post_public.php?id={$post_data['id']}'>";
                             echo "<img src='uploads/$post_data[image]' style='max-width: 100px; max-height: 100px;' alt='Post Image'>";
                             echo "<h3>{$post_data['title']}</h3>";
                             echo "<p>{$post_data['description']}</p>";
