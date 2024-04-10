@@ -47,11 +47,13 @@ a{
   margin-top: 20px;
 }
 .post-card {
-  width: calc(50% - 10px); /* Adjust width as per requirement */
+  width: calc(50% - 10px);
   margin-bottom: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px;
+  margin-right: 20px; 
+  text-align: justify;
 }
 .post-card img {
   max-width: 100%;
