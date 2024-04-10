@@ -57,6 +57,7 @@ if (!$data) {
                 <td>Status</td>
                 <td>Image</td>
                 <td colspan="2";>Option</td>
+                <td>Display post</td>
             </tr>
             <?php
             while($result = mysqli_fetch_assoc($data)){
@@ -69,6 +70,8 @@ if (!$data) {
                     <td><img src='uploads/$result[image]' style='max-width: 100px; max-height: 100px;' alt='Post Image'></td>
                     <td><a href='update_post.php?id=$result[id]'>Edit</a></td>
                     <td><a href='post_delete.php?id=$result[id]' onclick='return confirmDelete();'>DELETE</a></td>
+                    <td><a href='display_posts.php?id=$result[id]'>View</a></td>
+
                 </tr>";
             }
             ?>
