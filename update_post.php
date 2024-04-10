@@ -120,8 +120,7 @@ if (isset($_POST['update'])) {
         <option value="Draft" <?= $result['status'] == 'Draft' ? 'selected' : '' ?>>Draft</option>
         <option value="publish" <?= $result['status'] == 'publish' ? 'selected' : '' ?>>Publish</option>
     </select>
-
-    <input type="submit" value="Update" name="update" style="margin-top: 50px;">
+        <input type="submit" value="Update" name="update" style="margin-top: 50px;">
 </form>
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>

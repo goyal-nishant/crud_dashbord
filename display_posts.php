@@ -46,7 +46,9 @@ if(isset($_GET['id'])){
     <p>
         <a href='update_post.php?id=<?=$data["id"];?>'><input type="button" value="Edit"></a>
     </p>
-   
     
     </body> 
 </html>
+
+  
+   
