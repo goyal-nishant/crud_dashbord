@@ -58,15 +58,14 @@ if(isset($_POST['submit'])) {
         $error['status'] = "Please select a status.";
     }
 
-    // Image upload handling
-    $upload_directory = "uploads/"; // Directory where you want to store uploaded images
+    $upload_directory = "uploads/";
     $image_name = $_FILES['image']['name'];
     $image_tmp = $_FILES['image']['tmp_name'];
     $image_size = $_FILES['image']['size'];
 
     if (empty($image_name)) {
         $error['image'] = "Please select an image.";
-    } elseif ($image_size > 5000000) { // 5MB
+    } elseif ($image_size > 5000000) { 
         $error['image'] = "Image size must be less than 5MB";
     } else {
         $target_file = $upload_directory . basename($image_name);
@@ -76,20 +75,16 @@ if(isset($_POST['submit'])) {
     }
 
     if(empty($error)) {
-        // Convert array of categories into comma-separated string
         $categoryString = implode(',', $selected_categories);
         
-        // Insert into database
         $sql = "INSERT INTO posts (title, description, category, status, image) VALUES ('$title', '$description', '$categoryString', '$status', '$image_name')";
         $result = mysqli_query($GLOBALS['conn'], $sql);
         
         if($result) {
             $message = "Post inserted successfully.";
 
-            // Retrieve the ID of the newly inserted post
             $postId = mysqli_insert_id($GLOBALS['conn']);
 
-            // Loop through selected categories and insert post_id and category_id into posts_categories table
             foreach($selected_categories as $categoryId) {
                 $insertPostsCategoriesQuery = "INSERT INTO posts_categories (post_id, category_id) VALUES ('$postId', '$categoryId')";
                 mysqli_query($GLOBALS['conn'], $insertPostsCategoriesQuery);
@@ -203,7 +198,7 @@ if(isset($_POST['submit'])) {
                 formData.append('image', file);
 
                 $.ajax({
-                    url: 'upload_image.php', // Change this to the path of your PHP script handling image upload
+                    url: 'upload_image.php', 
                     method: 'POST',
                     data: formData,
                     processData: false,

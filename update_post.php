@@ -22,7 +22,6 @@ if ($query1) {
     while ($row = mysqli_fetch_assoc($query1)) {
         $categories[$row['id']] = $row['name'];
 
-        // Fetch subcategories for each parent category
         $subQuery = "SELECT * FROM categories WHERE parent_id = '{$row['id']}'";
         $subResult = mysqli_query($conn, $subQuery);
         if ($subResult) {
@@ -39,37 +38,48 @@ if (isset($_POST['update'])) {
     $status = $_POST['status'];
     $categories = $_POST['categories']; 
 
-    // Update the post with the new data
-    $sql = "UPDATE posts SET title='$title', description='$desc', status='$status', updated_at=NOW() WHERE id='$id'";
+    if (!empty($_FILES['image']['name'])) {
+        $image_name = $_FILES['image']['name'];
+        $image_tmp = $_FILES['image']['tmp_name'];
+        $image_size = $_FILES['image']['size'];
+
+        $upload_directory = "uploads/";
+
+        if ($image_size > 5000000) { 
+            $error['image'] = "Image size must be less than 5MB";
+        } else {
+            $target_file = $upload_directory . basename($image_name);
+            if (!move_uploaded_file($image_tmp, $target_file)) {
+                $error['image'] = "Error uploading image";
+            }
+        }
+    } else {
+        $image_name = $result['image'];
+    }
+
+    $sql = "UPDATE posts SET title='$title', description='$desc', status='$status', image='$image_name', updated_at=NOW() WHERE id='$id'";
     $query = mysqli_query($conn, $sql);
 
-    // Delete existing relations for this post
     $deleteQuery = "DELETE FROM posts_categories WHERE post_id='$id'";
     mysqli_query($conn, $deleteQuery);
 
-    // Define a function to generate the INSERT queries for categories
     function generateInsertQuery($categoryId) {
         global $id;
         return "INSERT INTO posts_categories (category_id, post_id) VALUES ('$categoryId', '$id');";
     }
 
-    // Generate the INSERT queries for each selected category
     $insertQueries = array_map('generateInsertQuery', $categories);
 
-    // Combine all INSERT queries into a single string
     $insertQuery = implode("", $insertQueries);
 
-    // Execute the multi-query
     if(mysqli_multi_query($conn, $insertQuery)) {
-        // Redirect to view_post.php with updated post ID
         header("location:view_post.php?id=$id");
-        exit(); // Exit to prevent further execution
+        exit(); 
     } else {
         echo "Error inserting categories: " . mysqli_error($conn);
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -80,7 +90,9 @@ if (isset($_POST['update'])) {
     <link rel="icon" type="image/x-icon" href="download.png">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>      
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
 </head>
 <body>
 <div>
@@ -120,43 +132,63 @@ if (isset($_POST['update'])) {
         <option value="Draft" <?= $result['status'] == 'Draft' ? 'selected' : '' ?>>Draft</option>
         <option value="publish" <?= $result['status'] == 'publish' ? 'selected' : '' ?>>Publish</option>
     </select>
-        <input type="submit" value="Update" name="update" style="margin-top: 50px;">
+    <div class="mb-3">
+        <label for="image" class="form-label">Image</label>
+        <input type="file" class="form-control" id="image" name="image">
+        <span><?= isset($error['image']) ? $error['image'] : "" ?></span>
+    </div>
+    <img id="featured-image" src="uploads/<?= $result["image"] ?>" alt="Featured Image" style="width:200px; height:200px">
+    <input type="submit" value="Update" name="update" style="margin-top: 50px;">
 </form>
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
 
 <script type="text/javascript">
-        $(document).ready(function() {
-            $("#desc").summernote({
-                placeholder: "Enter Description",
-                height: 300,
-                callbacks: {
-                    onImageUpload: function(files) {
-                        uploadImage(files[0]);
-                    }
+    $(document).ready(function() {
+        $("#desc").summernote({
+            placeholder: "Enter Description",
+            height: 300,
+            callbacks: {
+                onImageUpload: function(files) {
+                    uploadImage(files[0]);
                 }
-            });
-
-            function uploadImage(file) {
-                var formData = new FormData();
-                formData.append('image', file);
-
-                $.ajax({
-                    url: 'upload_image.php', 
-                    method: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        var imageUrl = response;
-                        $('#desc').summernote('insertImage', imageUrl);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                    }
-                });
             }
         });
-    </script>
+
+        function uploadImage(file) {
+            var formData = new FormData();
+            formData.append('image', file);
+
+            $.ajax({
+                url: 'upload_image.php',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    var imageUrl = response;
+                    $('#desc').summernote('insertImage', imageUrl);
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+
+        function updateFeaturedImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#featured-image').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $('#image').change(function() {
+            updateFeaturedImage(this);
+        });
+
+        $('#featured-image').attr('src', 'uploads/<?= $result["image"] ?>');
+    });
+</script>
 </body>
 </html>

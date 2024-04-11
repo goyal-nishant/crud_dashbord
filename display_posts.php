@@ -22,7 +22,7 @@ if(isset($_GET['id'])){
     <title>View Post</title>
     <link rel="stylesheet" href="display_posts.css">
 </head>
-<div class="p">
+  <div class="p">
         <a href='update_post.php?id=<?=$data["id"];?>'><input type="button" value="Edit"></a>
     </div>
 <body>

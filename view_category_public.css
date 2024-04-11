@@ -3,6 +3,7 @@
         border: 1px solid #ccc;
         margin-bottom: 20px;
         padding: 10px;
+        background-color: cadetblue;
     }
 
     .category-header {
@@ -15,7 +16,7 @@
     }
     .category-header h4 a{
         text-decoration: none;
-        color: black;
+        color: #3c565b;
     }
     .category-content {
         padding-left: 20px;
