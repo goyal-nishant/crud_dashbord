@@ -1,0 +1,40 @@
+.comment {
+margin-top: 20px;
+}
+
+.comment h3 {
+font-size: 1.2em;
+margin-bottom: 10px;
+}
+
+.comment form {
+margin-top: 10px;
+}
+
+.comment p {
+margin-bottom: 5px;
+}
+
+.comment .reply {
+margin-left: 20px; /* Indent replies */
+}
+
+.comment input[type="text"],
+.comment textarea {
+width: 100%;
+padding: 8px;
+margin-bottom: 10px;
+}
+
+.comment input[type="submit"] {
+padding: 8px 20px;
+background-color: #4CAF50;
+color: white;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+}
+
+.comment input[type="submit"]:hover {
+background-color: #45a049;
+}
