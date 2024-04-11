@@ -5,7 +5,6 @@ if (!isset($_SESSION['user_name'])) {
     exit();
 }
 
-
 include 'conn.php';
 $message = "";
 $error = array(); 
@@ -33,8 +32,6 @@ foreach ($categories as $catId => $catName) {
     }
 }
 
-$error = array(); 
-
 if(isset($_POST['submit'])) {
     $title = $_POST['title'];
     $description = $_POST['description'];
@@ -43,7 +40,7 @@ if(isset($_POST['submit'])) {
     } else {
         $selected_categories = array(); // Set it to an empty array if not set
     }
-        $status = $_POST['status'];
+    $status = $_POST['status'];
 
     if(empty($title)) {
         $error['title'] = "Please insert a title.";
@@ -62,10 +59,10 @@ if(isset($_POST['submit'])) {
     }
 
     // Image upload handling
+    $upload_directory = "uploads/"; // Directory where you want to store uploaded images
     $image_name = $_FILES['image']['name'];
     $image_tmp = $_FILES['image']['tmp_name'];
     $image_size = $_FILES['image']['size'];
-    $upload_directory = "uploads/"; // Directory where you want to store uploaded images
 
     if (empty($image_name)) {
         $error['image'] = "Please select an image.";
@@ -115,8 +112,8 @@ if(isset($_POST['submit'])) {
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="download.png">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
     <div class="topnav" id="myTopnav">
@@ -187,15 +184,40 @@ if(isset($_POST['submit'])) {
         <p class="message"><?php echo $message; ?></p>
     </form>
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        $("#desc").summernote({
-            placeholder: "Enter Description",
-            height: 300
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#desc").summernote({
+                placeholder: "Enter Description",
+                height: 300,
+                callbacks: {
+                    onImageUpload: function(files) {
+                        uploadImage(files[0]);
+                    }
+                }
+            });
+
+            function uploadImage(file) {
+                var formData = new FormData();
+                formData.append('image', file);
+
+                $.ajax({
+                    url: 'upload_image.php', // Change this to the path of your PHP script handling image upload
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        var imageUrl = response;
+                        $('#desc').summernote('insertImage', imageUrl);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
         });
-    });
-</script>
+    </script>
 </body>
 </html>

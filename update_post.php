@@ -126,12 +126,37 @@ if (isset($_POST['update'])) {
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        $("#desc").summernote({
-            placeholder: "Enter Description",
-            height: 300
+        $(document).ready(function() {
+            $("#desc").summernote({
+                placeholder: "Enter Description",
+                height: 300,
+                callbacks: {
+                    onImageUpload: function(files) {
+                        uploadImage(files[0]);
+                    }
+                }
+            });
+
+            function uploadImage(file) {
+                var formData = new FormData();
+                formData.append('image', file);
+
+                $.ajax({
+                    url: 'upload_image.php', 
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        var imageUrl = response;
+                        $('#desc').summernote('insertImage', imageUrl);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
         });
-    });
-</script>
+    </script>
 </body>
 </html>

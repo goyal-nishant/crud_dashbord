@@ -30,17 +30,17 @@
 
         }
         .post-content .description{
-            width: 480px;
+            width: 590px;
             text-align: justify;
         }
 
-        p {
+        .p {
             text-decoration: none;
             text-align: center;
             margin-top: 57px;
         }
 
-        p a input {
+        .p a input {
             color: white;
             border: 1px solid transparent;
             border-radius: .25rem;
