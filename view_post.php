@@ -52,11 +52,8 @@ if (!$data) {
     <link rel="icon" type="image/x-icon" href="download.png">
 </head>
 <body>
-    <div class="containers" style="display: flex; justify-content: space-around;">
-        <h3></h3>
-        <div></div>
-    </div>
-    <div class="border container pb-5 pt-3 " style="margin-bottom:30px; text-align: center;">
+  
+    <div class="border container pb-5 pt-3 " style="background-color:white; margin-bottom:30px; text-align: center;">
       <h3>All Post</h3>
       <div class="" style="margin-top: 25px;">
           <a class="ancor" href="post.php"><input  type="button" value="create post" name="" style="color: white;background-color: #0d6efd;font-weight: 400;line-height: 1.5;text-align: center;text-decoration: none;border: 1px solid transparent;padding: .375rem .75rem;font-size: 1rem;border-radius: .25rem;"></a>

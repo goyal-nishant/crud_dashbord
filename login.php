@@ -26,16 +26,17 @@ if(isset($_POST['login'])){
         
         <form method="POST" action="">
         <div class="form-group">
-            <label>username</label>
+            <label>Username</label>
             <input type="text" class="form-control"  name="username" placeholder="Enter your username" autocomplete="off">
         </div>    
 
         <div class="form-group">
-            <label>password</label>
+            <label>Password</label>
             <input type="password" class="form-control" name="password" placeholder="Enter your password" autocomplete="off">
         </div>    
      
         <input type="submit" class="btn btn-primary" value="login" name="login">
+        <a href="login_for_users.php"><input type="button" class="btn btn-primary" value="login as user" name="loginasuser"></a>
 
         </form>
      </div>

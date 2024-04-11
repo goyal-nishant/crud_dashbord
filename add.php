@@ -1,5 +1,6 @@
 <?php
 include "customers.php";
+include 'header_login.php';
 
 $obj = new Customers();
 $message = "";
@@ -18,7 +19,7 @@ if (isset($_POST['submit'])) {
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"/>
 </head>
 <body>
-    <div class="container"><h3>Registration form</h3></div>
+    <div class="container" style="margin-top:20px;"><h3>Registration form</h3></div>
     <div class="container">
         <form action="" method="POST">
             <div class="form-group">

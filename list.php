@@ -70,7 +70,7 @@ function showcategory($parentid, $level = 0) {
   <a href="javascript:void(0);" style="font-size:15px;" class="icon" onclick="myFunction()">&#9776;</a>
 </div>
 
-<div class="border container pb-5 pt-3 ml-1" style="text-align: center;">
+<div class="border container pb-5 pt-3 ml-1" style="text-align: center;background-color:white;">
     <h3>Categories</h3>
     <div class="" style="margin-top: 25px;">
          <a href="http://localhost/crudByoops/catagory.php"><input type="submit" value="Create Categories" class="btn btn-primary"></a>

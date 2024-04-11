@@ -1,7 +1,11 @@
 <?php
-
+session_start();
+if (!isset($_SESSION['user_name'])) {
+    header('location: login_for_users.php');
+    exit();
+}
 include 'connection.php';
-include 'header_user.php';
+include 'header_logout_user.php';
 
 function showcategory($parentid, $level = 0) {
     $output = ""; // Initialize $output variable
@@ -24,7 +28,7 @@ function showcategory($parentid, $level = 0) {
         $output .= "<div class='col-md-6'>\n";
         
         $output .= "<div class='category-box'>\n";
-        $output .= "<div class='category-header'><h4><a href='view_posts_by_category.php?category_id=".$data['id']."'>" . $data["name"] . "</a></h4></div>\n";
+        $output .= "<div class='category-header'><h4><a href='view_posts_by_category_for_uses.php?category_id=".$data['id']."'>" . $data["name"] . "</a></h4></div>\n";
         
         $output .= "<div class='category-content'>\n";
         $output .= showcategory($data['id'], $level + 1); 
