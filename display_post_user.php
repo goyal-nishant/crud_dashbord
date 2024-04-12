@@ -2,6 +2,14 @@
 include 'conn.php';
 include 'header_logout_user.php';
 
+session_start();
+if (!isset($_SESSION['user_name'])) {
+    header('location: login_for_users.php');
+    exit();
+}
+
+$replyers_name = $_SESSION['user_name'];
+
 if(isset($_GET['id'])){
     $category_id = $_GET['id'];
     $query = "SELECT * FROM posts WHERE id = '$category_id'";
@@ -20,11 +28,10 @@ if(isset($_GET['id'])){
 
 if(isset($_POST['submit_comment'])) {
     $comment_text = $_POST['comment_text'];
-    $commenter_name = $_POST['commenter_name'];
 
     $insert_query = "INSERT INTO posts_comments (post_id, comment_text, commenter_name) VALUES (?, ?, ?)";
     $stmt = mysqli_prepare($GLOBALS['conn'], $insert_query);
-    mysqli_stmt_bind_param($stmt, "iss", $category_id, $comment_text, $commenter_name);
+    mysqli_stmt_bind_param($stmt, "iss", $category_id, $comment_text, $replyers_name);
     $insert_result = mysqli_stmt_execute($stmt);
 
     if (!$insert_result) {
@@ -35,11 +42,10 @@ if(isset($_POST['submit_comment'])) {
 if(isset($_POST['submit_reply'])) {
     $parent_comment_id = $_POST['parent_comment_id'];
     $reply_text = $_POST['reply_text'];
-    $replyer_name = $_POST['replyer_name'];
 
     $insert_reply_query = "INSERT INTO posts_comments (post_id, comment_parent_id, comment_text, commenter_name) VALUES (?, ?, ?, ?)";
     $stmt = mysqli_prepare($GLOBALS['conn'], $insert_reply_query);
-    mysqli_stmt_bind_param($stmt, "iiss", $category_id, $parent_comment_id, $reply_text, $replyer_name);
+    mysqli_stmt_bind_param($stmt, "iiss", $category_id, $parent_comment_id, $reply_text, $replyers_name);
     $insert_reply_result = mysqli_stmt_execute($stmt);
 
     if (!$insert_reply_result) {
@@ -47,6 +53,37 @@ if(isset($_POST['submit_reply'])) {
     }
 }
 
+if(isset($_POST['update_comment'])) {
+    $comment_id = $_POST['comment_id'];
+    
+    if (isset($_POST['updated_comment_text'])) {
+        $updated_comment_text = $_POST['updated_comment_text'];
+
+        $update_query = "UPDATE posts_comments SET comment_text = ? WHERE id = ?";
+        $stmt = mysqli_prepare($GLOBALS['conn'], $update_query);
+        mysqli_stmt_bind_param($stmt, "si", $updated_comment_text, $comment_id);
+        $update_result = mysqli_stmt_execute($stmt);
+
+        if (!$update_result) {
+            echo "Error updating comment: " . mysqli_error($GLOBALS['conn']);
+        }
+    } else{
+        echo "Updated comment text is missing.";
+    }
+}
+
+if(isset($_POST['delete_comment'])) {
+    $comment_id = $_POST['comment_id'];
+
+    $delete_query = "DELETE FROM posts_comments WHERE id = ?";
+    $stmt = mysqli_prepare($GLOBALS['conn'], $delete_query);
+    mysqli_stmt_bind_param($stmt, "i", $comment_id);
+    $delete_result = mysqli_stmt_execute($stmt);
+
+    if (!$delete_result) {
+        echo "Error deleting comment: " . mysqli_error($GLOBALS['conn']);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -56,52 +93,7 @@ if(isset($_POST['submit_reply'])) {
     <title>View Post</title>
     <link rel="stylesheet" href="display_posts.css">
     <link rel="stylesheet" href="display_user_post.css">  
-    <style>
-        .comment {
-            margin-top: 20px;
-        }
-
-        .comment h3 {
-            font-size: 1.2em;
-            margin-bottom: 10px;
-        }
-
-        .comment form {
-            margin-top: 10px;
-        }
-
-        .comment p {
-            margin-bottom: 5px;
-        }
-
-        .comment .reply {
-            margin-left: 20px; /* Indent replies */
-        }
-
-        .comment input[type="text"],
-        .comment textarea {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-        }
-
-        .comment input[type="submit"] {
-            padding: 8px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .comment input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-
-        .reply-form {
-            display: none;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
     <div class="container">
@@ -119,54 +111,64 @@ if(isset($_POST['submit_reply'])) {
             <p>No post found.</p>
         <?php endif ?>
     </div>
-
-    <div class="comment">
+    <button class="comment-head btn btn-primary" onclick="showHide()">Add comment</button>
+    <div class="comment gradient-custom container" style="display: none;">
         <h3>Add a Comment</h3>
-        <form method="post">
-            <label for="commenter_name">Your Name:</label><br>
-            <input type="text" id="commenter_name" name="commenter_name"><br>
+        <form method="post" >
+            <input type="hidden" name="commenter_name" value="<?=$replyers_name?>">
             <label for="comment_text">Your Comment:</label><br>
             <textarea id="comment_text" name="comment_text"></textarea><br>
             <input type="submit" name="submit_comment" value="Submit Comment">
         </form>
-
-        <h3>Comments</h3>
+        
         <?php
-        $comments_query = "SELECT * FROM posts_comments WHERE post_id = $category_id ORDER BY created_at ASC";
+       function display_comments($parent_id = 0, $level = 0) {
+        global $category_id, $replyers_name;
+        $comments_query = "SELECT * FROM posts_comments WHERE post_id = $category_id AND comment_parent_id = $parent_id ORDER BY created_at ASC";
         $comments_result = mysqli_query($GLOBALS['conn'], $comments_query);
-
+    
         if ($comments_result && mysqli_num_rows($comments_result) > 0) {
-            while($comment = mysqli_fetch_assoc($comments_result)) {
-                if ($comment['comment_parent_id'] == 0) {
-                    echo "<p><strong>{$comment['commenter_name']}</strong>: {$comment['comment_text']} <br>at: {$comment['created_at']}</p>";
-
-                    $comment_id = $comment['id'];
-
-                    // Fetch and display reply comments
-                    $replies_query = "SELECT * FROM posts_comments WHERE comment_parent_id = $comment_id ORDER BY created_at ASC";
-                    $replies_result = mysqli_query($GLOBALS['conn'], $replies_query);
-
-                    if ($replies_result && mysqli_num_rows($replies_result) > 0) {
-                        while ($reply = mysqli_fetch_assoc($replies_result)) {
-                            echo "<p class='reply'><strong>{$reply['commenter_name']}</strong>: {$reply['comment_text']} <br>at: {$reply['created_at']}</p>";
-                        }
-                    }
-
-                    echo "<button class='reply-button' data-comment-id='{$comment_id}'>Reply</button>";
-
-                    echo "<form class='reply-form' id='reply-form-{$comment_id}' method='post' style='display: none;'>";
-                    echo "<input type='hidden' name='parent_comment_id' value='{$comment['id']}'>";
-                    echo "<label for='replyer_name'>Your Name:</label><br>";
-                    echo "<input type='text' id='replyer_name' name='replyer_name'><br>";
-                    echo "<label for='reply_text'>Your Reply:</label><br>";
-                    echo "<textarea id='reply_text' name='reply_text'></textarea><br>";
-                    echo "<input type='submit' name='submit_reply' value='Submit Reply'>";
+            while ($comment = mysqli_fetch_assoc($comments_result)) {
+                echo "<div id='comments-container'  class='comment' style='margin-left: " . ($level * 20) . "px;background-color:white;padding:30px'>";
+                echo "<p class='container' style='height:auto;'><strong>{$comment['commenter_name']}</strong>: {$comment['comment_text']} <br>at: {$comment['created_at']}</p>";
+                
+    
+                if ($replyers_name === $comment['commenter_name']) {
+                    // Display delete button only if the commenter is the currently logged-in user
+                    echo "<div class='comment-actions'>";
+                    echo "<form method='post' action='' onsubmit = return myfunc();>";
+                    echo "<input type='hidden' name='comment_id' value='{$comment['id']}'>";
+                    echo "<input type='submit' class='comment-action-button' name='delete_comment' value='Delete' onclick='return confirm(\"Are you sure you want to delete this comment?\")'>";
                     echo "</form>";
+                    echo "</div>";
+                }
+    
+                echo "<button class='reply-button' data-comment-id='{$comment['id']}'>Reply</button>";
+                echo "<form class='reply-form' id='reply-form-{$comment['id']}' method='post' style='display: none;'>";
+                echo "<input type='hidden' name='commenter_name' value='{$_SESSION['user_name']}'>"; // Use $_SESSION['user_name'] directly
+                echo "<input type='hidden' name='parent_comment_id' value='{$comment['id']}'>";
+                echo "<label for='reply_text'>Your Reply:</label><br>";
+                echo "<textarea id='reply_text' name='reply_text'></textarea><br>";
+                echo "<input type='submit' name='submit_reply' value='Submit Reply'>";
+                echo "</form>";
+    
+                // Update comment form
+               // echo "<button class='update-comment-button'>Update Comment</button>";
+                echo "<form class='update-comment-form' id='update-form-{$comment['id']}' method='post' style='display: none;'>";
+                echo "<input type='hidden' name='comment_id' value='{$comment['id']}'>";
+                echo "<label for='updated_comment_text'>Updated Comment:</label><br>";
+                echo "<textarea id='updated_comment_text' name='updated_comment_text'></textarea><br>";
+                echo "<input type='submit' name='update_comment' value='Update Comment'>";
+                echo "</form>";
+    
+                display_comments($comment['id'], $level + 1);
+    
+                echo "</div>";
                 }
             }
-        } else {
-            echo "No comments found.";
         }
+
+        display_comments(); 
         ?>
     </div>
 
@@ -182,7 +184,64 @@ if(isset($_POST['submit_reply'])) {
                 }
             });
         });
+
+        document.querySelectorAll('.update-comment-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.nextElementSibling.querySelector('input[name="comment_id"]').value;
+                const updateForm = document.querySelector(`#update-form-${commentId}`);
+                if (updateForm) {
+                    updateForm.style.display = updateForm.style.display === 'none' ? 'block' : 'none';
+                } else {
+                    console.error('Update form not found for comment ID:', commentId);
+                }
+            });
+        });
+    </script>
+    <script>
+             let comment = document.querySelector('.comment-head');
+             let comment_text  = document.querySelector('.comment');
+             let isShow = true;
+             function showHide() {
+                if(isShow) {
+                    comment_text.style.display = "none";
+                    isShow = false;
+                }else{
+                    comment_text.style.display = "block";
+                    isShow = true;
+                }
+                
+             }
+
+    </script>
+   <script>
+function deleteComment(commentId) {
+    fetch('delete_comment.php', {
+        method: 'POST',
+        body: new URLSearchParams({
+            comment_id: commentId
+        }),
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // If the request is successful, update the UI
+            const commentElement = document.getElementById('comment-' + commentId);
+            commentElement.remove(); // Remove the deleted comment from the page
+        } else {
+            console.error('Error deleting comment:', response.statusText);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting comment:', error);
+    });
+}
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    <script>
+        document.querySelector('')
     </script>
 </body>
 </html>
-
