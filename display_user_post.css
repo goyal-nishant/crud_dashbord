@@ -69,15 +69,13 @@
             border: none;
             font-size: 12px;
         }
-        .comments-container{
-        }
         .gradient-custom { 
              background: #4facfe;
              background: -webkit-linear-gradient(to bottom right, rgba(79, 172, 254,
                             1), rgba(0, 242, 254, 1)); 
              background: linear-gradient(to bottom right, rgba(79, 172, 254, 1), rgba(0,
                             242, 254, 1));
-             width: 700px;
+             width: auto;
              height:auto;
         }
         .comment-head{

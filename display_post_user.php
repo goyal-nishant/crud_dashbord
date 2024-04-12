@@ -33,6 +33,7 @@ if(isset($_POST['submit_comment'])) {
     $stmt = mysqli_prepare($GLOBALS['conn'], $insert_query);
     mysqli_stmt_bind_param($stmt, "iss", $category_id, $comment_text, $replyers_name);
     $insert_result = mysqli_stmt_execute($stmt);
+    var_dump($insert_result);
 
     if (!$insert_result) {
         echo "Error inserting comment: " . mysqli_error($GLOBALS['conn']);
@@ -113,11 +114,10 @@ if(isset($_POST['delete_comment'])) {
     </div>
     <button class="comment-head btn btn-primary" onclick="showHide()">Add comment</button>
     <div class="comment gradient-custom container" style="display: none;">
-        <h3>Add a Comment</h3>
-        <form method="post" >
-            <input type="hidden" name="commenter_name" value="<?=$replyers_name?>">
-            <label for="comment_text">Your Comment:</label><br>
-            <textarea id="comment_text" name="comment_text"></textarea><br>
+        <h3 style="color: white;">Add a Comment</h3>
+        <form id="comment-form" method="post">
+            <input type="hidden" name="user_name" value="<?php echo $_SESSION['user_name']; ?>">
+            <textarea name="comment_text"></textarea>
             <input type="submit" name="submit_comment" value="Submit Comment">
         </form>
         
@@ -213,35 +213,50 @@ if(isset($_POST['delete_comment'])) {
              }
 
     </script>
-   <script>
-function deleteComment(commentId) {
-    fetch('delete_comment.php', {
-        method: 'POST',
-        body: new URLSearchParams({
-            comment_id: commentId
-        }),
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            // If the request is successful, update the UI
-            const commentElement = document.getElementById('comment-' + commentId);
-            commentElement.remove(); // Remove the deleted comment from the page
-        } else {
-            console.error('Error deleting comment:', response.statusText);
-        }
-    })
-    .catch(error => {
-        console.error('Error deleting comment:', error);
-    });
-}
-</script>
+    <script>
+        // Add an event listener to the comment form submission
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelector('#comment-form').addEventListener('submit', function (event) {
+                // Prevent the default form submission behavior
+                event.preventDefault();
+
+                // Serialize the form data
+                var formData = new FormData(this);
+
+                // Send the serialized data to the server using AJAX
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'comment_submission_script.php', true);
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 400) {
+                        // Handle the response from the server
+                        console.log(xhr.responseText);
+
+                        // Check if the response indicates successful comment submission
+                        if (xhr.responseText === "Comment submitted successfully!") {
+                            // Update the UI to indicate success (e.g., display a success message)
+                            alert("Comment submitted successfully!");
+
+                            // Optionally, clear the comment input field
+                            document.getElementById('comment_text').value = '';
+                        } else {
+                            // Handle other responses or errors
+                        }
+                    } else {
+                        console.error('Error: ' + xhr.status);
+                    }
+                };
+                xhr.onerror = function () {
+                    console.error('Request failed');
+                };
+                xhr.send(formData);
+            });
+        });
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <script>
-        document.querySelector('')
+        //document.querySelector('')
     </script>
 </body>
 </html>
