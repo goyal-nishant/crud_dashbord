@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_name'])) {
 }
 include 'conn.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_comment']) && isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+if ( isset($_POST['comment_text'])) {
     $comment_text = $_POST['comment_text'];
     $category_id = $_POST['category_id'];
     $user_name = $_SESSION['user_name']; // Retrieve user name from session

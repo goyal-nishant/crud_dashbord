@@ -26,19 +26,19 @@ if(isset($_GET['id'])){
     }
 }
 
-if(isset($_POST['submit_comment'])) {
-    $comment_text = $_POST['comment_text'];
+// if(isset($_POST['submit_comment'])) {
+//     $comment_text = $_POST['comment_text'];
 
-    $insert_query = "INSERT INTO posts_comments (post_id, comment_text, commenter_name) VALUES (?, ?, ?)";
-    $stmt = mysqli_prepare($GLOBALS['conn'], $insert_query);
-    mysqli_stmt_bind_param($stmt, "iss", $category_id, $comment_text, $replyers_name);
-    $insert_result = mysqli_stmt_execute($stmt);
-    var_dump($insert_result);
+//     $insert_query = "INSERT INTO posts_comments (post_id, comment_text, commenter_name) VALUES (?, ?, ?)";
+//     $stmt = mysqli_prepare($GLOBALS['conn'], $insert_query);
+//     mysqli_stmt_bind_param($stmt, "iss", $category_id, $comment_text, $replyers_name);
+//     $insert_result = mysqli_stmt_execute($stmt);
+//     var_dump($insert_result);
 
-    if (!$insert_result) {
-        echo "Error inserting comment: " . mysqli_error($GLOBALS['conn']);
-    }
-}
+//     if (!$insert_result) {
+//         echo "Error inserting comment: " . mysqli_error($GLOBALS['conn']);
+//     }
+// }
 
 if(isset($_POST['submit_reply'])) {
     $parent_comment_id = $_POST['parent_comment_id'];
@@ -217,6 +217,7 @@ if(isset($_POST['delete_comment'])) {
         // Add an event listener to the comment form submission
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelector('#comment-form').addEventListener('submit', function (event) {
+                alert('test');
                 // Prevent the default form submission behavior
                 event.preventDefault();
 
