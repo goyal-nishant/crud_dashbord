@@ -81,3 +81,12 @@
         .comment-head{
             margin-left: 320px;
         }
+        .comment {
+            margin-top: 20px;
+            position: relative;
+        }
+        .comment h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
