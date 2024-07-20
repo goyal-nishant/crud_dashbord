@@ -193,6 +193,7 @@ if(isset($_POST['submit'])) {
                 }
             });
 
+            //this is my name  nishant
             function uploadImage(file) {
                 var formData = new FormData();
                 formData.append('image', file);
