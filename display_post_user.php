@@ -118,7 +118,6 @@ if (isset($_GET['id'])) {
 
             var confirmation = confirm("Are you sure you want to delete this comment?");
 
-            // If user confirms deletion
             if (confirmation) {
                 $.ajax({
                     type: 'POST',
@@ -129,7 +128,6 @@ if (isset($_GET['id'])) {
                     dataType: 'json',
                     success: function(response) {
                         if (response.status === 'success') {
-                            // Remove the comment from the DOM
                             $('#comment-' + commentId).remove();
                         } else {
                             alert('Failed to delete comment. Please try again later.');
@@ -185,6 +183,7 @@ if (isset($_GET['id'])) {
         }
     }
     $(document).ready(function() {
+
         function addNewComment(comment) {
             $('.outer-comment-container').prepend("<div id='comment-" + comment.id + "' class='comment' style='margin-left: 12px; background-color: white; padding: 30px;'>" +
                 "<p class='container custom_data' style='height:auto;'><strong>" + comment.commenter_name + "</strong>: " + comment.comment_text + "<br>" + "at: " + comment.created_at + "</p></div>");
@@ -202,24 +201,24 @@ if (isset($_GET['id'])) {
                         comment_text: text,
                         category_id: category_id
                     },
-                    success: function(data) {
-                        if (data) {
-                            let response = JSON.parse(data);
-                            addNewComment(response);
-                            $('#comment-form')[0].reset();
-                        } else {
-                            // If there are no existing comments, add the first one directly
-                            var response = {
-                                id: 0, // Set a dummy ID for the first comment
-                                commenter_name: '<?php echo $_SESSION['user_name']; ?>',
-                                comment_text: text,
-                                created_at: new Date().toLocaleString() // Use current time as the creation time
-                            };
-                            addNewComment(response);
-                            $('#comment-form')[0].reset();
+                        success: function(data) {
+                            if (data) {
+                                let response = JSON.parse(data);
+                                addNewComment(response);
+                                $('#comment-form')[0].reset();
+                            } else {
+                                // If there are no existing comments, add the first one directly
+                                var response = {
+                                    id: 0, // Set a dummy ID for the first comment
+                                    commenter_name: '<?php echo $_SESSION['user_name']; ?>',
+                                    comment_text: text,
+                                    created_at: new Date().toLocaleString() // Use current time as the creation time
+                                };
+                                addNewComment(response);
+                                $('#comment-form')[0].reset();
+                            }
                         }
-                    }
-                });
+                    });
             } else {
                 $('#showContext').show();
             }

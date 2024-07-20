@@ -4,7 +4,7 @@ if (!isset($_SESSION['user_name'])) {
     header('location: login.php');
     exit();
     }
-include 'connection.php';
+include 'connection.php';       
 
 function showcategory($parentid, $level = 0) {
     $sql = "SELECT * FROM categories WHERE parent_id = $parentid";

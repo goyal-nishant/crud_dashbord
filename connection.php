@@ -2,7 +2,7 @@
 $Servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "post";
+$dbname = "cat_post";
 
 $connect = new mysqli($Servername,$username,$password,$dbname);
 

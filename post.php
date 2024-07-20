@@ -38,7 +38,7 @@ if(isset($_POST['submit'])) {
     if(isset($_POST['categories'])) {
         $selected_categories = $_POST['categories']; 
     } else {
-        $selected_categories = array(); // Set it to an empty array if not set
+        $selected_categories = array(); 
     }
     $status = $_POST['status'];
 
